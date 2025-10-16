@@ -1,0 +1,103 @@
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig MICROXRCEDDSCLIENT
+    bool
+    default n
+    prompt "Micro XRCE-DDS Client Support"
+    select APP_LINK_WITH_MICROXRCEDDSCLIENT
+    help
+      Enable the Micro XRCE-DDS Client library support.
+      This library provides DDS-XRCE protocol implementation
+      for microcontroller environments.
+
+if MICROXRCEDDSCLIENT
+
+config APP_LINK_WITH_MICROXRCEDDSCLIENT
+        bool "Link 'app' with Micro XRCE-DDS Client"
+        default n
+        help
+            Add Micro XRCE-DDS Client header files to the 'app' include path. 
+
+    choice MICROXRCEDDSCLIENT_TRANSPORT
+        prompt "Micro XRCE-DDS Client transport"
+        default MICROXRCEDDSCLIENT_TRANSPORT_SERIAL_USB
+        
+        config MICROXRCEDDSCLIENT_TRANSPORT_SERIAL
+            bool "Micro XRCE-DDS Client serial transport"
+            select RING_BUFFER
+        config MICROXRCEDDSCLIENT_TRANSPORT_SERIAL_USB
+            bool "Micro XRCE-DDS Client USB serial transport"
+             select RING_BUFFER
+             select USB_DEVICE_STACK
+        config MICROXRCEDDSCLIENT_TRANSPORT_UDP
+            bool "Micro XRCE-DDS Client UDP network transport"
+        
+    endchoice
+
+    config MICROXRCEDDSCLIENT_PARTICIPANT_NAME
+        string "Micro XRCE-DDS Client participant name"
+        default "default_xrce_participant"
+
+    config MICROXRCEDDSCLIENT_ROS_TOPIC_NAMESPACE
+        string "Micro XRCE-DDS Client ROS Topic namespace"
+        default "miracdds"
+
+    if MICROXRCEDDSCLIENT_TRANSPORT_UDP
+        config MICROXRCEDDSCLIENT_AGENT_IP
+            string "Micro XRCE-DDS Client Agent IP"
+            default "192.168.1.100"
+            help
+                Micro XRCE-DDS Client Agent IP.
+        
+        config MICROXRCEDDSCLIENT_AGENT_PORT
+            string "Micro XRCE-DDS Client Agent Port"
+            default "8888"
+            help
+                Micro XRCE-DDS Client Agent port.
+
+        menu "WiFi Configuration"
+
+            config MICROXRCEDDSCLIENT_WIFI_SSID
+                string "WiFi SSID"
+                default "myssid"
+                help
+                    SSID (network name) for the example to connect to.
+        
+            config MICROXRCEDDSCLIENT_WIFI_PASSWORD
+                string "WiFi Password"
+                default "mypassword"
+                help
+                    WiFi password (WPA or WPA2) for the example to use.
+        endmenu
+    endif
+
+    if MICROXRCEDDSCLIENT_TRANSPORT_SERIAL
+        config MICROXRCEDDSCLIENT_SERIAL_PORT
+            string "Micro XRCE-DDS Client Agent serial port"
+            default "1"
+            help
+                Micro XRCE-DDS Client Agent IP.
+    endif
+
+    if MICROXRCEDDSCLIENT_TRANSPORT_SERIAL_USB
+        config USB_CDC_ACM
+            bool 
+            default y
+        config USB_CDC_ACM_RINGBUF_SIZE
+            int "USB-CDC-ACM Ringbuffer size"
+            default "2048"
+        config USB_DEVICE_PRODUCT
+            string "USB Device Product"
+            default "Zephyr Micro XRCE-DDS Client"
+
+    endif
+    
+    config MICROXRCEDDSCLIENT_XRCE_DDS_MTU
+        string "Micro XRCE-DDS Client transport MTU"
+        default "512"
+        
+    config MICROXRCEDDSCLIENT_XRCE_DDS_HISTORIC
+        string "Micro XRCE-DDS Client middleware memory slots"
+        default "8"
+
+endif # MICROXRCEDDSCLIENT

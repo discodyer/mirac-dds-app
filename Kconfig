@@ -1,0 +1,5 @@
+mainmenu "MiracZ7"
+
+source "Kconfig.zephyr"
+
+rsource "modules/Kconfig"
